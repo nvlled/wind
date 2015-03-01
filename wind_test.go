@@ -79,32 +79,32 @@ var stars = makeRenderLayer('*')
 // compute(8, min(9)) = 8
 func TestStringCanvas(t *testing.T) {
 	layer1 := Vlayer(
-		Dim(-1, 3, text("some text here\nand more text here\nand here")),
-		Dim(20, 2, spikes),
-		Dim(-1, 5, text("you just spent eternities\nworking on this crap\n")),
+		SizeH(3, text("some text here\nand more text here\nand here")),
+		Size(20, 2, spikes),
+		SizeH(5, text("you just spent eternities\nworking on this crap\n")),
 	)
 	layer2 := Border('―', '|', Vlayer(
 		layer1,
-		Dim(-1, 1, Hlayer(spikes)),
+		SizeH(1, Hlayer(spikes)),
 		Zlayer(
-			Dim(-1, -1, stars),
-			Dim(-1, 3, text("wasn't I just going to make text games...\nhow did I come to this")),
-			//Dim(4, 3, doughs),
-			AlignDownRight(Dim(10, 3, doughs)),
-			AlignDown(Dim(-1, 1, text("oh well... text aligned at the bottom here"))),
-			//Zlayer(AlignRight(Dim(4, 3, doughs))),
+			stars,
+			SizeH(3, text("wasn't I just going to make text games...\nhow did I come to this")),
+			//Size(4, 3, doughs),
+			AlignDownRight(Size(10, 3, doughs)),
+			AlignDown(SizeH(1, text("oh well... text aligned at the bottom here"))),
+			//Zlayer(AlignRight(Size(4, 3, doughs))),
 		),
 	))
 	layer3 := AlignDown(Zlayer(
-		Dim(22, 22, stars),
-		Dim(21, 21, doughs),
-		Dim(20, 20, spikes),
-		Dim(19, 19, stars),
-		Dim(18, 18, doughs),
+		Size(22, 22, stars),
+		Size(21, 21, doughs),
+		Size(20, 20, spikes),
+		Size(19, 19, stars),
+		Size(18, 18, doughs),
 	))
 	layer4 := Hlayer(
-		Dim(30, -1, layer3),
-		Dim(-1, -1, layer2),
+		Size(30, -1, layer3),
+		Size(-1, -1, layer2),
 	)
 	//println(layer1, layer2, layer3, layer4)
 	canvas := NewStringCanvas(100, 25)
@@ -117,11 +117,11 @@ func TestStringCanvas2(t *testing.T) {
 	layer := Border('+', 'x',
 		Zlayer(
 			AlignDownRight(Hlayer(
-				Dim(5, 5, stars),
-				Dim(8, 6, doughs),
-				Dim(30, 10, spikes),
+				Size(5, 5, stars),
+				Size(8, 6, doughs),
+				Size(30, 10, spikes),
 			)),
-			AlignDown(Dim(20, 3, Border('-', '|', text("bordered text")))),
+			AlignDown(Size(20, 3, Border('-', '|', text("bordered text")))),
 		))
 	layer.Render(canvas)
 	println(canvas.String())

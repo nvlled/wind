@@ -321,19 +321,19 @@ func (c *constrainer) Render(canvas Canvas) {
 	c.layer.Render(canvas)
 }
 
-func Dim(width, height int, layer Layer) Layer {
+func Size(width, height int, layer Layer) Layer {
 	w := size.Int(width)
 	h := size.Int(height)
 	return &constrainer{w, h, layer}
 }
 
-func DimW(width int, layer Layer) Layer {
+func SizeW(width int, layer Layer) Layer {
 	w := size.Int(width)
 	var h size.T = nil
 	return &constrainer{w, h, layer}
 }
 
-func DimH(height int, layer Layer) Layer {
+func SizeH(height int, layer Layer) Layer {
 	var w size.T = nil
 	h := size.Int(height)
 	return &constrainer{w, h, layer}
