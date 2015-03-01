@@ -266,15 +266,18 @@ func (aligner *aligner) Elements() []Layer {
 }
 
 func (aligner *aligner) Render(canvas Canvas) {
+	x, y := 0, 0
 	layer := aligner.layer
+	w, h := computeDimension(layer, canvas)
+
 	if aligner.right {
-		x := canvas.Width() - layer.Width().Value(canvas.Width())
-		canvas = canvas.New(x, 0, canvas.Width()-x, canvas.Height())
+		x = canvas.Width() - w
 	}
 	if aligner.down {
-		y := canvas.Height() - layer.Height().Value(canvas.Height())
-		canvas = canvas.New(0, y, canvas.Width(), canvas.Height()-y)
+		y = canvas.Height() - h
 	}
+
+	canvas = canvas.New(x, y, w, h)
 	layer.Render(canvas)
 }
 

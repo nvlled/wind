@@ -113,12 +113,16 @@ func TestStringCanvas(t *testing.T) {
 }
 
 func TestStringCanvas2(t *testing.T) {
-	canvas := NewStringCanvas(100, 5)
-	layer := Hlayer(AlignDownRight(Hlayer(
-		Dim(5, 5, stars),
-		Dim(8, 6, doughs),
-		Dim(30, 10, spikes),
-	)))
+	canvas := NewStringCanvas(100, 10)
+	layer := BorderLayer('+', 'x',
+		Zlayer(
+			AlignDownRight(Hlayer(
+				Dim(5, 5, stars),
+				Dim(8, 6, doughs),
+				Dim(30, 10, spikes),
+			)),
+			AlignDown(Dim(20, 3, BorderLayer('-', '|', text("bordered text")))),
+		))
 	layer.Render(canvas)
 	println(canvas.String())
 }
