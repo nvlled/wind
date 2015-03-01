@@ -13,37 +13,10 @@ import (
 // 4*****---------------
 // 5--------------------
 
-func makeRenderLayer(ch rune) Layer {
-	return RenderLayer(func(canvas Canvas) {
-		w, h := canvas.Dimension()
-		for y := 0; y < h; y++ {
-			for x := 0; x < w; x++ {
-				canvas.Draw(x, y, ch, 0, 0)
-			}
-		}
-	})
-}
-
-func text(s string) Layer {
-	return RenderLayer(func(canvas Canvas) {
-		x := 0
-		y := 0
-		for _, ch := range []rune(s) {
-			if ch == '\n' {
-				x = 0
-				y++
-			} else {
-				canvas.Draw(x, y, ch, 0, 0)
-				x++
-			}
-		}
-	})
-}
-
-var blanks = makeRenderLayer('_')
-var spikes = makeRenderLayer('^')
-var doughs = makeRenderLayer('$')
-var stars = makeRenderLayer('*')
+var blanks = CharBlock('_')
+var spikes = CharBlock('^')
+var doughs = CharBlock('$')
+var stars = CharBlock('*')
 
 //---------------------------------------------
 //|a | b  | c |  d |  e | f |                 |
@@ -79,19 +52,19 @@ var stars = makeRenderLayer('*')
 // compute(8, min(9)) = 8
 func TestStringCanvas(t *testing.T) {
 	layer1 := Vlayer(
-		SizeH(3, text("some text here\nand more text here\nand here")),
+		Text("some text here\nand more text here\nand here"),
 		Size(20, 2, spikes),
-		SizeH(5, text("you just spent eternities\nworking on this crap\n")),
+		Text("you just spent eternities\nworking on this crap\n"),
 	)
 	layer2 := Border('―', '|', Vlayer(
 		layer1,
 		SizeH(1, Hlayer(spikes)),
 		Zlayer(
 			stars,
-			SizeH(3, text("wasn't I just going to make text games...\nhow did I come to this")),
+			Text("wasn't I just going to make text games...\nhow did I come to this"),
 			//Size(4, 3, doughs),
 			AlignDownRight(Size(10, 3, doughs)),
-			AlignDown(SizeH(1, text("oh well... text aligned at the bottom here"))),
+			AlignDown(SizeH(1, TextLine("oh well... text aligned at the bottom here"))),
 			//Zlayer(AlignRight(Size(4, 3, doughs))),
 		),
 	))
@@ -113,7 +86,7 @@ func TestStringCanvas(t *testing.T) {
 }
 
 func TestStringCanvas2(t *testing.T) {
-	canvas := NewStringCanvas(100, 10)
+	canvas := NewStringCanvas(100, 15)
 	layer := Border('+', 'x',
 		Zlayer(
 			AlignDownRight(Hlayer(
@@ -121,7 +94,11 @@ func TestStringCanvas2(t *testing.T) {
 				Size(8, 6, doughs),
 				Size(30, 10, spikes),
 			)),
-			AlignDown(Size(20, 3, Border('-', '|', text("bordered text")))),
+			AlignDown(Border('-', '|', Text("bordered text"))),
+			Vlayer(
+				Border('*', '*', Text("line one\nline two\nline three")),
+				TextLine("line four\nline five"),
+			),
 		))
 	layer.Render(canvas)
 	println(canvas.String())

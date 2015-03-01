@@ -3,6 +3,7 @@ package wind
 import (
 	term "github.com/nsf/termbox-go"
 	"github.com/nvlled/wind/size"
+	"strings"
 )
 
 type Opt struct {
@@ -123,6 +124,39 @@ func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }
 func (f RenderLayer) Elements() []Layer    { return nil }
+
+func CharBlock(ch rune) Layer {
+	return RenderLayer(func(canvas Canvas) {
+		w, h := canvas.Dimension()
+		for y := 0; y < h; y++ {
+			for x := 0; x < w; x++ {
+				canvas.Draw(x, y, ch, 0, 0)
+			}
+		}
+	})
+}
+
+func TextLine(s string) Layer {
+	return SizeH(1, RenderLayer(func(canvas Canvas) {
+		x, y := 0, 0
+		for _, ch := range []rune(s) {
+			if ch == '\n' {
+				ch = '↵'
+			}
+			canvas.Draw(x, y, ch, 0, 0)
+			x++
+		}
+	}))
+}
+
+func Text(s string) Layer {
+	var layers []Layer
+	for _, line := range strings.Split(s, "\n") {
+		w := len(line)
+		layers = append(layers, SizeW(w, TextLine(line)))
+	}
+	return Vlayer(layers...)
+}
 
 func computeDimension(layer Layer, canvas Canvas) (int, int) {
 	cwidth, cheight := canvas.Dimension()
