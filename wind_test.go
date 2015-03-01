@@ -83,7 +83,7 @@ func TestStringCanvas(t *testing.T) {
 		Dim(20, 2, spikes),
 		Dim(-1, 5, text("you just spent eternities\nworking on this crap\n")),
 	)
-	layer2 := BorderLayer('―', '|', Vlayer(
+	layer2 := Border('―', '|', Vlayer(
 		layer1,
 		Dim(-1, 1, Hlayer(spikes)),
 		Zlayer(
@@ -114,14 +114,14 @@ func TestStringCanvas(t *testing.T) {
 
 func TestStringCanvas2(t *testing.T) {
 	canvas := NewStringCanvas(100, 10)
-	layer := BorderLayer('+', 'x',
+	layer := Border('+', 'x',
 		Zlayer(
 			AlignDownRight(Hlayer(
 				Dim(5, 5, stars),
 				Dim(8, 6, doughs),
 				Dim(30, 10, spikes),
 			)),
-			AlignDown(Dim(20, 3, BorderLayer('-', '|', text("bordered text")))),
+			AlignDown(Dim(20, 3, Border('-', '|', text("bordered text")))),
 		))
 	layer.Render(canvas)
 	println(canvas.String())

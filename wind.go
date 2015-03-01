@@ -374,6 +374,6 @@ func (bLayer *borderLayer) Render(canvas Canvas) {
 	bLayer.layer.Render(canvas)
 }
 
-func BorderLayer(cx, cy rune, layer Layer) Layer {
+func Border(cx, cy rune, layer Layer) Layer {
 	return &borderLayer{Wrapper{layer}, cx, cy}
 }
