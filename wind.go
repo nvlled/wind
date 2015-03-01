@@ -390,9 +390,21 @@ func (wrap *Wrapper) Elements() []Layer {
 }
 
 type borderLayer struct {
-	Wrapper
-	chX rune
-	chY rune
+	layer Layer
+	chX   rune
+	chY   rune
+}
+
+func (bLayer *borderLayer) Width() size.T {
+	return bLayer.layer.Width().Add(size.Const(2))
+}
+
+func (bLayer *borderLayer) Height() size.T {
+	return bLayer.layer.Height().Add(size.Const(2))
+}
+
+func (bLayer *borderLayer) Elements() []Layer {
+	return []Layer{bLayer.layer}
 }
 
 func (bLayer *borderLayer) Render(canvas Canvas) {
@@ -409,5 +421,5 @@ func (bLayer *borderLayer) Render(canvas Canvas) {
 }
 
 func Border(cx, cy rune, layer Layer) Layer {
-	return &borderLayer{Wrapper{layer}, cx, cy}
+	return &borderLayer{layer, cx, cy}
 }
