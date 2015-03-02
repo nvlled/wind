@@ -88,6 +88,17 @@ type TermCanvas struct {
 	height int
 }
 
+// Invoke termbox.Init() before creating TermCanvas
+func NewTermCanvas() Canvas {
+	w, h := term.Size()
+	return &TermCanvas{
+		baseX:  0,
+		baseY:  0,
+		width:  w,
+		height: h,
+	}
+}
+
 func (canvas *TermCanvas) New(x, y, width, height int) Canvas {
 	return &TermCanvas{
 		baseX:  canvas.baseX + x,
