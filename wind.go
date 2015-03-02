@@ -90,8 +90,8 @@ type TermCanvas struct {
 
 func (canvas *TermCanvas) New(x, y, width, height int) Canvas {
 	return &TermCanvas{
-		baseX:  clamp(canvas.baseX+x, 0, width),
-		baseY:  clamp(canvas.baseY+y, 0, height),
+		baseX:  canvas.baseX + x,
+		baseY:  canvas.baseY + y,
 		width:  clamp(width, 0, canvas.width),
 		height: clamp(height, 0, canvas.height),
 	}
@@ -138,12 +138,12 @@ func CharBlock(ch rune) Layer {
 
 func TextLine(s string) Layer {
 	return SizeH(1, RenderLayer(func(canvas Canvas) {
-		x, y := 0, 0
+		x := 0
 		for _, ch := range []rune(s) {
 			if ch == '\n' {
 				ch = '↵'
 			}
-			canvas.Draw(x, y, ch, 0, 0)
+			canvas.Draw(x, 0, ch, 0, 0)
 			x++
 		}
 	}))
