@@ -15,6 +15,7 @@ type Opt struct {
 type Canvas interface {
 	New(baseX, baseY, width, height int) Canvas
 	Draw(x, y int, ch rune, fg, bg uint16)
+	Clear()
 
 	Width() int
 	Height() int
@@ -61,6 +62,14 @@ func (canvas *StringCanvas) Draw(x, y int, ch rune, _, _ uint16) {
 	//if canvas.baseX+x < len(canvas.buffer) && canvas.baseY+y < len(canvas.buffer[0]) {
 	if x < canvas.Width() && y < canvas.Height() {
 		canvas.buffer[canvas.baseY+y][canvas.baseX+x] = ch
+	}
+}
+
+func (canvas *StringCanvas) Clear() {
+	for x := 0; x < canvas.width; x++ {
+		for y := 0; y < canvas.height; y++ {
+			canvas.Draw(x, y, ' ', 0, 0)
+		}
 	}
 }
 
@@ -118,6 +127,14 @@ func (canvas *TermCanvas) Draw(x, y int, ch rune, fg, bg uint16) {
 		y >= 0 && y <= canvas.height {
 		term.SetCell(canvas.baseX+x, canvas.baseY+y,
 			ch, term.Attribute(fg), term.Attribute(bg))
+	}
+}
+
+func (canvas *TermCanvas) Clear() {
+	for x := 0; x < canvas.width; x++ {
+		for y := 0; y < canvas.height; y++ {
+			canvas.Draw(x, y, ' ', 0, 0)
+		}
 	}
 }
 
