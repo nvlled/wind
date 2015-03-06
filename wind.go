@@ -19,6 +19,7 @@ type Canvas interface {
 	Width() int
 	Height() int
 	Dimension() (int, int)
+	Base() (int, int)
 }
 
 type StringCanvas struct {
@@ -67,6 +68,10 @@ func (canvas *StringCanvas) Width() int  { return canvas.width }
 func (canvas *StringCanvas) Height() int { return canvas.height }
 func (canvas *StringCanvas) Dimension() (int, int) {
 	return canvas.width, canvas.height
+}
+
+func (canvas *StringCanvas) Base() (int, int) {
+	return canvas.baseX, canvas.baseY
 }
 
 func (canvas *StringCanvas) String() string {
@@ -120,6 +125,10 @@ func (canvas *TermCanvas) Width() int  { return canvas.width }
 func (canvas *TermCanvas) Height() int { return canvas.height }
 func (canvas *TermCanvas) Dimension() (int, int) {
 	return canvas.width, canvas.height
+}
+
+func (canvas *TermCanvas) Base() (int, int) {
+	return canvas.baseX, canvas.baseY
 }
 
 type Layer interface {
