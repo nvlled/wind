@@ -135,7 +135,6 @@ type Layer interface {
 	Width() size.T
 	Height() size.T
 	Render(canvas Canvas)
-	Elements() []Layer
 }
 
 type RenderLayer func(canvas Canvas)
@@ -143,7 +142,6 @@ type RenderLayer func(canvas Canvas)
 func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }
-func (f RenderLayer) Elements() []Layer    { return nil }
 
 func CharBlock(ch rune) Layer {
 	return RenderLayer(func(canvas Canvas) {
@@ -195,9 +193,6 @@ func (layer hLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
 }
 
-func (layer hLayer) Elements() []Layer {
-	return layer.elements
-}
 
 func (layer hLayer) Render(canvas Canvas) {
 	elements := layer.elements
@@ -229,10 +224,6 @@ func (layer *vLayer) Height() size.T {
 	return size.Sum(mapHeights(layer.elements))
 }
 
-func (layer *vLayer) Elements() []Layer {
-	return layer.elements
-}
-
 func (layer *vLayer) Render(canvas Canvas) {
 	width, height := computeDimension(layer, canvas)
 	widths := mapWidths(layer.elements)
@@ -260,10 +251,6 @@ func (layer zLayer) Width() size.T {
 
 func (layer zLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
-}
-
-func (layer zLayer) Elements() []Layer {
-	return layer.elements
 }
 
 func (layer zLayer) Render(canvas Canvas) {
@@ -315,10 +302,6 @@ func (aligner *aligner) Height() size.T {
 	return size.Free
 }
 
-func (aligner *aligner) Elements() []Layer {
-	return []Layer{aligner.layer}
-}
-
 func (aligner *aligner) Render(canvas Canvas) {
 	x, y := 0, 0
 	layer := aligner.layer
@@ -367,10 +350,6 @@ func (c *constrainer) Height() size.T {
 	return c.height
 }
 
-func (c *constrainer) Elements() []Layer {
-	return []Layer{c.layer}
-}
-
 func (c *constrainer) Render(canvas Canvas) {
 	c.layer.Render(canvas)
 }
@@ -405,10 +384,6 @@ func (wrap *Wrapper) Height() size.T {
 	return wrap.layer.Height()
 }
 
-func (wrap *Wrapper) Elements() []Layer {
-	return []Layer{wrap.layer}
-}
-
 type borderLayer struct {
 	layer Layer
 	chX   rune
@@ -421,10 +396,6 @@ func (bLayer *borderLayer) Width() size.T {
 
 func (bLayer *borderLayer) Height() size.T {
 	return bLayer.layer.Height().Add(size.Const(2))
-}
-
-func (bLayer *borderLayer) Elements() []Layer {
-	return []Layer{bLayer.layer}
 }
 
 func (bLayer *borderLayer) Render(canvas Canvas) {
