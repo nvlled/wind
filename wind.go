@@ -384,6 +384,10 @@ func (c *constrainer) Render(canvas Canvas) {
 	c.layer.Render(canvas)
 }
 
+func Free(layer Layer) Layer {
+	return &constrainer{size.Free, size.Free, layer}
+}
+
 func Size(width, height int, layer Layer) Layer {
 	w := size.Int(width)
 	h := size.Int(height)
@@ -443,4 +447,8 @@ func (bLayer *borderLayer) Render(canvas Canvas) {
 
 func Border(cx, cy rune, layer Layer) Layer {
 	return &borderLayer{layer, cx, cy}
+}
+
+func Line(ch rune) Layer {
+	return SizeH(1, CharBlock(ch))
 }
