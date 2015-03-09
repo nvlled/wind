@@ -161,6 +161,72 @@ func (canvas *TermCanvas) Base() (int, int) {
 	return canvas.baseX, canvas.baseY
 }
 
+type ColorCanvas struct {
+	fg     uint16
+	bg     uint16
+	canvas Canvas
+}
+
+func ChangeDefaultColor(fg, bg uint16, canvas Canvas) Canvas {
+	return &ColorCanvas{
+		fg:     fg,
+		bg:     bg,
+		canvas: canvas,
+	}
+}
+
+func (ccanvas *ColorCanvas) New(x, y, width, height int) Canvas {
+	return &ColorCanvas{
+		fg:     ccanvas.fg,
+		bg:     ccanvas.bg,
+		canvas: ccanvas.canvas.New(x, y, width, height),
+	}
+}
+
+func (ccanvas *ColorCanvas) Width() int {
+	return ccanvas.Width()
+}
+
+func (ccanvas *ColorCanvas) Height() int {
+	return ccanvas.Height()
+}
+
+func (ccanvas *ColorCanvas) Dimension() (int, int) {
+	return ccanvas.Dimension()
+}
+
+func (ccanvas *ColorCanvas) Base() (int, int) {
+	return ccanvas.Base()
+}
+
+func (ccanvas *ColorCanvas) Clear() {
+	for x := 0; x < ccanvas.Width(); x++ {
+		for y := 0; y < ccanvas.Height(); y++ {
+			ccanvas.Draw(x, y, ' ', ccanvas.fg, ccanvas.bg)
+		}
+	}
+}
+
+func (ccanvas *ColorCanvas) Draw(x, y int, ch rune, fg, bg uint16) {
+	if fg == 0 {
+		fg = ccanvas.fg
+	}
+	if bg == 0 {
+		bg = ccanvas.bg
+	}
+	ccanvas.canvas.Draw(x, y, ch, fg, bg)
+}
+
+func (ccanvas *ColorCanvas) DrawText(x, y int, s string, fg, bg uint16) {
+	if fg == 0 {
+		fg = ccanvas.fg
+	}
+	if bg == 0 {
+		bg = ccanvas.bg
+	}
+	ccanvas.canvas.DrawText(x, y, s, fg, bg)
+}
+
 type Layer interface {
 	Width() size.T
 	Height() size.T
