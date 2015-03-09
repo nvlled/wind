@@ -518,3 +518,19 @@ func Border(cx, cy rune, layer Layer) Layer {
 func Line(ch rune) Layer {
 	return SizeH(1, CharBlock(ch))
 }
+
+func TapRender(layer Layer, render func(layer Layer, canvas Canvas)) Layer {
+	return &Wrapper{
+		layer: layer,
+		renderer: func(canvas Canvas) {
+			render(layer, canvas)
+		},
+	}
+}
+
+func SetColor(fg, bg uint16, layer Layer) Layer {
+	return TapRender(layer, func(layer Layer, canvas Canvas) {
+		canvas = ChangeDefaultColor(fg, bg, canvas)
+		layer.Render(canvas)
+	})
+}
