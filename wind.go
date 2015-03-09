@@ -473,7 +473,8 @@ func SizeH(height int, layer Layer) Layer {
 }
 
 type Wrapper struct {
-	layer Layer
+	layer    Layer
+	renderer func(canvas Canvas)
 }
 
 func (wrap *Wrapper) Width() size.T {
@@ -482,6 +483,14 @@ func (wrap *Wrapper) Width() size.T {
 
 func (wrap *Wrapper) Height() size.T {
 	return wrap.layer.Height()
+}
+
+func (wrap *Wrapper) Render(canvas Canvas) {
+	if wrap.renderer != nil {
+		wrap.renderer(canvas)
+	} else {
+		wrap.layer.Render(canvas)
+	}
 }
 
 type borderLayer struct {
