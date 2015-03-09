@@ -1,9 +1,7 @@
 package wind
 
 import (
-	term "github.com/nsf/termbox-go"
 	"github.com/nvlled/wind/size"
-	"strings"
 )
 
 type Opt struct {
@@ -12,265 +10,9 @@ type Opt struct {
 	align  int
 }
 
-type Canvas interface {
-	New(baseX, baseY, width, height int) Canvas
-	Draw(x, y int, ch rune, fg, bg uint16)
-	DrawText(x, y int, s string, fg, bg uint16)
-	Clear()
-
-	Width() int
-	Height() int
-	Dimension() (int, int)
-	Base() (int, int)
-}
-
-type StringCanvas struct {
-	buffer [][]rune
-	baseX  int
-	baseY  int
-	width  int
-	height int
-}
-
-func NewStringCanvas(width, height int) *StringCanvas {
-	buffer := make([][]rune, height)
-	for i := range buffer {
-		buffer[i] = make([]rune, width)
-		for j := range buffer[i] {
-			buffer[i][j] = ' '
-		}
-	}
-	return &StringCanvas{
-		buffer: buffer,
-		baseX:  0,
-		baseY:  0,
-		width:  width,
-		height: height,
-	}
-}
-
-func (canvas *StringCanvas) New(x, y, width, height int) Canvas {
-	return &StringCanvas{
-		buffer: canvas.buffer,
-		baseX:  canvas.baseX + x,
-		baseY:  canvas.baseY + y,
-		width:  width,
-		height: height,
-	}
-}
-
-func (canvas *StringCanvas) Draw(x, y int, ch rune, _, _ uint16) {
-	//if canvas.baseX+x < len(canvas.buffer) && canvas.baseY+y < len(canvas.buffer[0]) {
-	if x < canvas.Width() && y < canvas.Height() {
-		canvas.buffer[canvas.baseY+y][canvas.baseX+x] = ch
-	}
-}
-
-func (canvas *StringCanvas) DrawText(x, y int, s string, _, _ uint16) {
-	for i, ch := range []rune(s) {
-		canvas.Draw(x+i, y, ch, 0, 0)
-	}
-}
-
-func (canvas *StringCanvas) Clear() {
-	for x := 0; x < canvas.width; x++ {
-		for y := 0; y < canvas.height; y++ {
-			canvas.Draw(x, y, ' ', 0, 0)
-		}
-	}
-}
-
-func (canvas *StringCanvas) Width() int  { return canvas.width }
-func (canvas *StringCanvas) Height() int { return canvas.height }
-func (canvas *StringCanvas) Dimension() (int, int) {
-	return canvas.width, canvas.height
-}
-
-func (canvas *StringCanvas) Base() (int, int) {
-	return canvas.baseX, canvas.baseY
-}
-
-func (canvas *StringCanvas) String() string {
-	s := ""
-	w, h := canvas.Dimension()
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			s += string(canvas.buffer[y][x])
-		}
-		s += "\n"
-	}
-	return s
-}
-
-type TermCanvas struct {
-	baseX  int
-	baseY  int
-	width  int
-	height int
-}
-
-// Invoke termbox.Init() before creating TermCanvas
-func NewTermCanvas() Canvas {
-	w, h := term.Size()
-	return &TermCanvas{
-		baseX:  0,
-		baseY:  0,
-		width:  w,
-		height: h,
-	}
-}
-
-func (canvas *TermCanvas) New(x, y, width, height int) Canvas {
-	return &TermCanvas{
-		baseX:  canvas.baseX + x,
-		baseY:  canvas.baseY + y,
-		width:  clamp(width, 0, canvas.width),
-		height: clamp(height, 0, canvas.height),
-	}
-}
-
-func (canvas *TermCanvas) Draw(x, y int, ch rune, fg, bg uint16) {
-	if x >= 0 && x <= canvas.width &&
-		y >= 0 && y <= canvas.height {
-		term.SetCell(canvas.baseX+x, canvas.baseY+y,
-			ch, term.Attribute(fg), term.Attribute(bg))
-	}
-}
-
-func (canvas *TermCanvas) Clear() {
-	for x := 0; x < canvas.width; x++ {
-		for y := 0; y < canvas.height; y++ {
-			canvas.Draw(x, y, ' ', 0, 0)
-		}
-	}
-}
-
-func (canvas *TermCanvas) DrawText(x, y int, s string, fg, bg uint16) {
-	for i, ch := range []rune(s) {
-		canvas.Draw(x+i, y, ch, fg, bg)
-	}
-}
-
-func (canvas *TermCanvas) Width() int  { return canvas.width }
-func (canvas *TermCanvas) Height() int { return canvas.height }
-func (canvas *TermCanvas) Dimension() (int, int) {
-	return canvas.width, canvas.height
-}
-
-func (canvas *TermCanvas) Base() (int, int) {
-	return canvas.baseX, canvas.baseY
-}
-
-type ColorCanvas struct {
-	fg     uint16
-	bg     uint16
-	canvas Canvas
-}
-
-func ChangeDefaultColor(fg, bg uint16, canvas Canvas) Canvas {
-	return &ColorCanvas{
-		fg:     fg,
-		bg:     bg,
-		canvas: canvas,
-	}
-}
-
-func (ccanvas *ColorCanvas) New(x, y, width, height int) Canvas {
-	return &ColorCanvas{
-		fg:     ccanvas.fg,
-		bg:     ccanvas.bg,
-		canvas: ccanvas.canvas.New(x, y, width, height),
-	}
-}
-
-func (ccanvas *ColorCanvas) Width() int {
-	return ccanvas.Width()
-}
-
-func (ccanvas *ColorCanvas) Height() int {
-	return ccanvas.Height()
-}
-
-func (ccanvas *ColorCanvas) Dimension() (int, int) {
-	return ccanvas.Dimension()
-}
-
-func (ccanvas *ColorCanvas) Base() (int, int) {
-	return ccanvas.Base()
-}
-
-func (ccanvas *ColorCanvas) Clear() {
-	for x := 0; x < ccanvas.Width(); x++ {
-		for y := 0; y < ccanvas.Height(); y++ {
-			ccanvas.Draw(x, y, ' ', ccanvas.fg, ccanvas.bg)
-		}
-	}
-}
-
-func (ccanvas *ColorCanvas) Draw(x, y int, ch rune, fg, bg uint16) {
-	if fg == 0 {
-		fg = ccanvas.fg
-	}
-	if bg == 0 {
-		bg = ccanvas.bg
-	}
-	ccanvas.canvas.Draw(x, y, ch, fg, bg)
-}
-
-func (ccanvas *ColorCanvas) DrawText(x, y int, s string, fg, bg uint16) {
-	if fg == 0 {
-		fg = ccanvas.fg
-	}
-	if bg == 0 {
-		bg = ccanvas.bg
-	}
-	ccanvas.canvas.DrawText(x, y, s, fg, bg)
-}
-
-type Layer interface {
-	Width() size.T
-	Height() size.T
-	Render(canvas Canvas)
-}
-
-type RenderLayer func(canvas Canvas)
-
 func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }
-
-func CharBlock(ch rune) Layer {
-	return RenderLayer(func(canvas Canvas) {
-		w, h := canvas.Dimension()
-		for y := 0; y < h; y++ {
-			for x := 0; x < w; x++ {
-				canvas.Draw(x, y, ch, 0, 0)
-			}
-		}
-	})
-}
-
-func TextLine(s string) Layer {
-	return SizeH(1, RenderLayer(func(canvas Canvas) {
-		x := 0
-		for _, ch := range []rune(s) {
-			if ch == '\n' {
-				ch = '↵'
-			}
-			canvas.Draw(x, 0, ch, 0, 0)
-			x++
-		}
-	}))
-}
-
-func Text(s string) Layer {
-	var layers []Layer
-	for _, line := range strings.Split(s, "\n") {
-		w := len(line)
-		layers = append(layers, SizeW(w, TextLine(line)))
-	}
-	return Vlayer(layers...)
-}
 
 func computeDimension(layer Layer, canvas Canvas) (int, int) {
 	cwidth, cheight := canvas.Dimension()
@@ -279,7 +21,9 @@ func computeDimension(layer Layer, canvas Canvas) (int, int) {
 	return width, height
 }
 
-type hLayer struct{ elements []Layer }
+type hLayer struct {
+	elements []Layer
+}
 
 func (layer hLayer) Width() size.T {
 	return size.Sum(mapWidths(layer.elements))
@@ -288,7 +32,6 @@ func (layer hLayer) Width() size.T {
 func (layer hLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
 }
-
 
 func (layer hLayer) Render(canvas Canvas) {
 	elements := layer.elements
@@ -367,18 +110,6 @@ func (layer zLayer) Render(canvas Canvas) {
 	}
 }
 
-func Hlayer(elements ...Layer) Layer {
-	return &hLayer{elements}
-}
-
-func Vlayer(elements ...Layer) Layer {
-	return &vLayer{elements}
-}
-
-func Zlayer(elements ...Layer) Layer {
-	return &zLayer{elements}
-}
-
 // meaningful only if subLayer doesn't have Free width or height
 type aligner struct {
 	layer Layer
@@ -392,6 +123,11 @@ type aligner struct {
 func (aligner *aligner) Width() size.T {
 	//return aligner.layer.Width()
 	return size.Free
+	// On second thought, this has suprising result as well.
+	// The aligner should just be given an explicit dimension:
+	//	SizeW(10, AlignRight(...))
+	// or
+	//  Free(AlignRight())
 }
 
 func (aligner *aligner) Height() size.T {
@@ -412,18 +148,6 @@ func (aligner *aligner) Render(canvas Canvas) {
 
 	canvas = canvas.New(x, y, w, h)
 	layer.Render(canvas)
-}
-
-func AlignRight(layer Layer) Layer {
-	return &aligner{layer, true, false}
-}
-
-func AlignDown(layer Layer) Layer {
-	return &aligner{layer, false, true}
-}
-
-func AlignDownRight(layer Layer) Layer {
-	return &aligner{layer, true, true}
 }
 
 type constrainer struct {
@@ -448,28 +172,6 @@ func (c *constrainer) Height() size.T {
 
 func (c *constrainer) Render(canvas Canvas) {
 	c.layer.Render(canvas)
-}
-
-func Free(layer Layer) Layer {
-	return &constrainer{size.Free, size.Free, layer}
-}
-
-func Size(width, height int, layer Layer) Layer {
-	w := size.Int(width)
-	h := size.Int(height)
-	return &constrainer{w, h, layer}
-}
-
-func SizeW(width int, layer Layer) Layer {
-	w := size.Int(width)
-	var h size.T = nil
-	return &constrainer{w, h, layer}
-}
-
-func SizeH(height int, layer Layer) Layer {
-	var w size.T = nil
-	h := size.Int(height)
-	return &constrainer{w, h, layer}
 }
 
 type Wrapper struct {
@@ -518,28 +220,4 @@ func (bLayer *borderLayer) Render(canvas Canvas) {
 	}
 	canvas = canvas.New(1, 1, canvas.Width()-2, canvas.Height()-2)
 	bLayer.layer.Render(canvas)
-}
-
-func Border(cx, cy rune, layer Layer) Layer {
-	return &borderLayer{layer, cx, cy}
-}
-
-func Line(ch rune) Layer {
-	return SizeH(1, CharBlock(ch))
-}
-
-func TapRender(layer Layer, render func(layer Layer, canvas Canvas)) Layer {
-	return &Wrapper{
-		layer: layer,
-		renderer: func(canvas Canvas) {
-			render(layer, canvas)
-		},
-	}
-}
-
-func SetColor(fg, bg uint16, layer Layer) Layer {
-	return TapRender(layer, func(layer Layer, canvas Canvas) {
-		canvas = ChangeDefaultColor(fg, bg, canvas)
-		layer.Render(canvas)
-	})
 }
