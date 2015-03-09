@@ -62,6 +62,8 @@ type Layer interface {
 
 type RenderLayer func(canvas Canvas)
 
+type Defer func() Layer
+
 func Text(s string) Layer {
 	var layers []Layer
 	for _, line := range strings.Split(s, "\n") {

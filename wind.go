@@ -8,6 +8,23 @@ func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }
 
+type blank struct{}
+
+func (_ blank) Width() size.T        { return size.Const(0) }
+func (_ blank) Height() size.T       { return size.Const(0) }
+func (_ blank) Render(canvas Canvas) {}
+
+func wrapNil(layer Layer) Layer {
+	if layer == nil {
+		return blank{}
+	}
+	return layer
+}
+
+func (fn Defer) Width() size.T        { return wrapNil(fn()).Width() }
+func (fn Defer) Height() size.T       { return wrapNil(fn()).Height() }
+func (fn Defer) Render(canvas Canvas) { wrapNil(fn()).Render(canvas) }
+
 func computeDimension(layer Layer, canvas Canvas) (int, int) {
 	cwidth, cheight := canvas.Dimension()
 	width := layer.Width().Value(cwidth)
@@ -121,6 +138,7 @@ type aligner struct {
 //   SizeW(10, AlignRight(...))
 // or
 //   Free(AlignRight())
+// return aligner.layer.Width()
 
 func (aligner *aligner) Width() size.T {
 	return size.Free
