@@ -164,3 +164,15 @@ func SetColor(fg, bg uint16, layer Layer) Layer {
 		layer.Render(canvas)
 	})
 }
+
+func SyncSize(ref Layer, layer Layer) Layer {
+	return &syncer{ref, layer, true, true}
+}
+
+func SyncSizeW(ref Layer, layer Layer) Layer {
+	return &syncer{ref, layer, true, false}
+}
+
+func SyncSizeH(ref Layer, layer Layer) Layer {
+	return &syncer{ref, layer, false, true}
+}

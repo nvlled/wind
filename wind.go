@@ -217,3 +217,31 @@ func (bLayer *borderLayer) Render(canvas Canvas) {
 	canvas = canvas.New(1, 1, canvas.Width()-2, canvas.Height()-2)
 	bLayer.layer.Render(canvas)
 }
+
+// ref must not be a subLayer
+// or else tortoise all the way down
+
+type syncer struct {
+	ref        Layer
+	layer      Layer
+	syncWidth  bool
+	syncHeight bool
+}
+
+func (s *syncer) Width() size.T {
+	if s.ref != nil && s.syncWidth {
+		return s.ref.Width()
+	}
+	return s.layer.Width()
+}
+
+func (s *syncer) Height() size.T {
+	if s.ref != nil && s.syncHeight {
+		return s.ref.Height()
+	}
+	return s.layer.Height()
+}
+
+func (s *syncer) Render(canvas Canvas) {
+	s.layer.Render(canvas)
+}
