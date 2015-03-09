@@ -23,7 +23,6 @@ func (canvas *StringCanvas) New(x, y, width, height int) Canvas {
 }
 
 func (canvas *StringCanvas) Draw(x, y int, ch rune, _, _ uint16) {
-	//if canvas.baseX+x < len(canvas.buffer) && canvas.baseY+y < len(canvas.buffer[0]) {
 	if x < canvas.Width() && y < canvas.Height() {
 		canvas.buffer[canvas.baseY+y][canvas.baseX+x] = ch
 	}

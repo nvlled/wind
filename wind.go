@@ -4,12 +4,6 @@ import (
 	"github.com/nvlled/wind/size"
 )
 
-type Opt struct {
-	height size.T
-	width  size.T
-	align  int
-}
-
 func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }
@@ -110,24 +104,26 @@ func (layer zLayer) Render(canvas Canvas) {
 	}
 }
 
-// meaningful only if subLayer doesn't have Free width or height
 type aligner struct {
 	layer Layer
-	// Has effect only if (sub)layer doesn't have...
-	right bool // ..free width
-	down  bool // and free height
+	right bool
+	down  bool
 }
 
-// Needs to have Free width and height
-// to have room for aligning
+// (sub)layer needs to have a size
+// smaller than the one allocated to the aligner.
+// Otherwise there will be no noticeable effect.
+// Returning Free as the size seems to work, but has
+// an unexpected result.
+
+// I'm still thinking of what the best approach
+// for this, but the alternative options would be:
+//   SizeW(10, AlignRight(...))
+// or
+//   Free(AlignRight())
+
 func (aligner *aligner) Width() size.T {
-	//return aligner.layer.Width()
 	return size.Free
-	// On second thought, this has suprising result as well.
-	// The aligner should just be given an explicit dimension:
-	//	SizeW(10, AlignRight(...))
-	// or
-	//  Free(AlignRight())
 }
 
 func (aligner *aligner) Height() size.T {
