@@ -127,19 +127,19 @@ func (ccanvas *ColorCanvas) New(x, y, width, height int) Canvas {
 }
 
 func (ccanvas *ColorCanvas) Width() int {
-	return ccanvas.Width()
+	return ccanvas.canvas.Width()
 }
 
 func (ccanvas *ColorCanvas) Height() int {
-	return ccanvas.Height()
+	return ccanvas.canvas.Height()
 }
 
 func (ccanvas *ColorCanvas) Dimension() (int, int) {
-	return ccanvas.Dimension()
+	return ccanvas.canvas.Dimension()
 }
 
 func (ccanvas *ColorCanvas) Base() (int, int) {
-	return ccanvas.Base()
+	return ccanvas.canvas.Base()
 }
 
 func (ccanvas *ColorCanvas) Clear() {
