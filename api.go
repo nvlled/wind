@@ -178,3 +178,16 @@ func SyncSizeW(ref Layer, layer Layer) Layer {
 func SyncSizeH(ref Layer, layer Layer) Layer {
 	return &syncer{ref, layer, false, true}
 }
+
+// nil comparison may fail,
+// deferred function must make sure
+// that nil is returned.
+func Either(left Defer, right Layer) Layer {
+	return RenderLayer(func(canvas Canvas) {
+		layer := left()
+		if layer == nil {
+			layer = right
+		}
+		layer.Render(canvas)
+	})
+}
