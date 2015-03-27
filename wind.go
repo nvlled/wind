@@ -4,6 +4,10 @@ import (
 	"github.com/nvlled/wind/size"
 )
 
+// TODO: Rename Vlayer to Ylayer, Hlayer to Xlayer
+//		 because it sounds more cool-er
+//		 and consistent with Zlayer
+
 func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }
@@ -24,13 +28,6 @@ func wrapNil(layer Layer) Layer {
 func (fn Defer) Width() size.T        { return wrapNil(fn()).Width() }
 func (fn Defer) Height() size.T       { return wrapNil(fn()).Height() }
 func (fn Defer) Render(canvas Canvas) { wrapNil(fn()).Render(canvas) }
-
-func computeDimension(layer Layer, canvas Canvas) (int, int) {
-	cwidth, cheight := canvas.Dimension()
-	width := layer.Width().Value(cwidth)
-	height := layer.Height().Value(cheight)
-	return width, height
-}
 
 type hLayer struct {
 	elements []Layer

@@ -4,6 +4,13 @@ import (
 	"github.com/nvlled/wind/size"
 )
 
+func computeDimension(layer Layer, canvas Canvas) (int, int) {
+	cwidth, cheight := canvas.Dimension()
+	width := layer.Width().Value(cwidth)
+	height := layer.Height().Value(cheight)
+	return width, height
+}
+
 func defaultSize(s size.T) size.T {
 	if s == nil {
 		return size.Free
