@@ -97,6 +97,19 @@ func TextLine(s string) Layer {
 	}))
 }
 
+func Cache(element Layer) Layer {
+	if subLayer, ok := element.(listLayer); ok {
+		return &cacheLayer{
+			subLayer:     subLayer,
+			width:        size.Free,
+			height:       size.Free,
+			allocWidths:  nil,
+			allocHeights: nil,
+		}
+	}
+	return element
+}
+
 func Hlayer(elements ...Layer) Layer {
 	return &hLayer{elements}
 }

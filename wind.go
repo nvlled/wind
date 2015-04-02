@@ -29,8 +29,65 @@ func (fn Defer) Width() size.T        { return wrapNil(fn()).Width() }
 func (fn Defer) Height() size.T       { return wrapNil(fn()).Height() }
 func (fn Defer) Render(canvas Canvas) { wrapNil(fn()).Render(canvas) }
 
-type hLayer struct {
-	elements []Layer
+type listLayer interface {
+	Layer
+	Elements() []Layer
+	AllocSizes(w, h int) ([]int, []int)
+	RenderAlloc(canvas Canvas, widths, heights []int)
+}
+
+type cacheLayer struct {
+	subLayer     listLayer
+	width        size.T
+	height       size.T
+	allocWidths  []int
+	allocHeights []int
+	sizeCached   bool
+	allocCached  bool
+}
+
+func (layer *cacheLayer) cacheSize() {
+	subLayer := layer.subLayer
+	if !layer.sizeCached {
+		layer.width = subLayer.Width()
+		layer.height = subLayer.Height()
+		layer.sizeCached = true
+	}
+}
+
+func (layer *cacheLayer) cacheAlloc(w, h int) ([]int, []int) {
+	if !layer.allocCached {
+		subLayer := layer.subLayer
+		widths, heights := subLayer.AllocSizes(w, h)
+		layer.allocWidths = widths
+		layer.allocHeights = heights
+		layer.allocCached = true
+	}
+	return layer.allocWidths, layer.allocHeights
+}
+
+func (layer *cacheLayer) Width() size.T {
+	layer.cacheSize()
+	layer.sizeCached = true
+	return layer.width
+}
+
+func (layer *cacheLayer) Height() size.T {
+	layer.cacheSize()
+	return layer.height
+}
+
+func (layer *cacheLayer) Render(canvas Canvas) {
+	subLayer := layer.subLayer
+	w, h := computeDimension(layer, canvas)
+	widths, heights := layer.cacheAlloc(w, h)
+	subLayer.RenderAlloc(canvas, widths, heights)
+}
+
+type hLayer struct{ elements []Layer }
+
+func (layer hLayer) Elements() []Layer {
+	return layer.elements
 }
 
 func (layer hLayer) Width() size.T {
