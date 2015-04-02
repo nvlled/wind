@@ -17,6 +17,9 @@ type ConstT int
 type RangeT struct{ min, max int }
 type FreeT struct{}
 
+type Folder func(sizes []T) T
+type Allocator func(x int, sizes []T) []int
+
 func Const(x int) ConstT    { return ConstT(x) }
 func Range(x, y int) RangeT { return RangeT{x, y} }
 

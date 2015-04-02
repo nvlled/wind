@@ -84,6 +84,12 @@ func (layer *cacheLayer) Render(canvas Canvas) {
 	subLayer.RenderAlloc(canvas, widths, heights)
 }
 
+func renderListLayer(layer listLayer, canvas Canvas) {
+	w, h := computeDimension(layer, canvas)
+	widths, heights := layer.AllocSizes(w, h)
+	layer.RenderAlloc(canvas, widths, heights)
+}
+
 type hLayer struct{ elements []Layer }
 
 func (layer hLayer) Elements() []Layer {
@@ -98,18 +104,19 @@ func (layer hLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
 }
 
-func (layer hLayer) Render(canvas Canvas) {
+func (layer hLayer) AllocSizes(w, h int) ([]int, []int) {
+	widths := size.AllocFair(w, mapWidths(layer.elements))
+	heights := size.AllocMax(h, mapHeights(layer.elements))
+	return widths, heights
+}
+
+func (layer hLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
 	elements := layer.elements
-	width, height := computeDimension(layer, canvas)
-	widths := mapWidths(elements)
-	heights := mapHeights(elements)
 	x, y := 0, 0
 
-	allocWidths := size.AllocFair(width, widths)
-	allocHeights := size.AllocMax(height, heights)
 	for i, elem := range elements {
-		w := allocWidths[i]
-		h := allocHeights[i]
+		w := widths[i]
+		h := heights[i]
 
 		subCanvas := canvas.New(x, y, w, h)
 		elem.Render(subCanvas)
@@ -118,7 +125,13 @@ func (layer hLayer) Render(canvas Canvas) {
 	}
 }
 
+func (layer hLayer) Render(canvas Canvas) { renderListLayer(layer, canvas) }
+
 type vLayer struct{ elements []Layer }
+
+func (layer *vLayer) Elements() []Layer {
+	return layer.elements
+}
 
 func (layer *vLayer) Width() size.T {
 	return size.Max(mapWidths(layer.elements))
@@ -128,17 +141,17 @@ func (layer *vLayer) Height() size.T {
 	return size.Sum(mapHeights(layer.elements))
 }
 
-func (layer *vLayer) Render(canvas Canvas) {
-	width, height := computeDimension(layer, canvas)
-	widths := mapWidths(layer.elements)
-	heights := mapHeights(layer.elements)
-	x, y := 0, 0
+func (layer *vLayer) AllocSizes(w, h int) ([]int, []int) {
+	widths := size.AllocMax(w, mapWidths(layer.elements))
+	heights := size.AllocFair(h, mapHeights(layer.elements))
+	return widths, heights
+}
 
-	allocWidths := size.AllocMax(width, widths)
-	allocHeights := size.AllocFair(height, heights)
+func (layer *vLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
+	x, y := 0, 0
 	for i, elem := range layer.elements {
-		w := allocWidths[i]
-		h := allocHeights[i]
+		w := widths[i]
+		h := heights[i]
 
 		subCanvas := canvas.New(x, y, w, h)
 		elem.Render(subCanvas)
@@ -147,7 +160,13 @@ func (layer *vLayer) Render(canvas Canvas) {
 	}
 }
 
+func (layer *vLayer) Render(canvas Canvas) { renderListLayer(layer, canvas) }
+
 type zLayer struct{ elements []Layer }
+
+func (layer *zLayer) Elements() []Layer {
+	return layer.elements
+}
 
 func (layer zLayer) Width() size.T {
 	return size.Max(mapWidths(layer.elements))
@@ -157,23 +176,24 @@ func (layer zLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
 }
 
-func (layer zLayer) Render(canvas Canvas) {
-	elements := layer.elements
-	width, height := computeDimension(layer, canvas)
-	widths := mapWidths(elements)
-	heights := mapHeights(elements)
-	x, y := 0, 0
+func (layer zLayer) AllocSizes(w, h int) ([]int, []int) {
+	widths := size.AllocMax(w, mapWidths(layer.elements))
+	heights := size.AllocMax(h, mapHeights(layer.elements))
+	return widths, heights
+}
 
-	allocWidths := size.AllocMax(width, widths)
-	allocHeights := size.AllocMax(height, heights)
-	for i, elem := range elements {
-		w := allocWidths[i]
-		h := allocHeights[i]
+func (layer zLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
+	x, y := 0, 0
+	for i, elem := range layer.elements {
+		w := widths[i]
+		h := heights[i]
 
 		subCanvas := canvas.New(x, y, w, h)
 		elem.Render(subCanvas)
 	}
 }
+
+func (layer *zLayer) Render(canvas Canvas) { renderListLayer(layer, canvas) }
 
 type aligner struct {
 	layer Layer

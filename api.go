@@ -111,15 +111,15 @@ func Cache(element Layer) Layer {
 }
 
 func Hlayer(elements ...Layer) Layer {
-	return &hLayer{elements}
+	return Cache(&hLayer{elements})
 }
 
 func Vlayer(elements ...Layer) Layer {
-	return &vLayer{elements}
+	return Cache(&vLayer{elements})
 }
 
 func Zlayer(elements ...Layer) Layer {
-	return &zLayer{elements}
+	return Cache(&zLayer{elements})
 }
 
 func AlignRight(layer Layer) Layer {
