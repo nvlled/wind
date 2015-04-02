@@ -92,25 +92,25 @@ func renderListLayer(layer listLayer, canvas Canvas) {
 
 type hLayer struct{ elements []Layer }
 
-func (layer hLayer) Elements() []Layer {
+func (layer *hLayer) Elements() []Layer {
 	return layer.elements
 }
 
-func (layer hLayer) Width() size.T {
+func (layer *hLayer) Width() size.T {
 	return size.Sum(mapWidths(layer.elements))
 }
 
-func (layer hLayer) Height() size.T {
+func (layer *hLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
 }
 
-func (layer hLayer) AllocSizes(w, h int) ([]int, []int) {
+func (layer *hLayer) AllocSizes(w, h int) ([]int, []int) {
 	widths := size.AllocFair(w, mapWidths(layer.elements))
 	heights := size.AllocMax(h, mapHeights(layer.elements))
 	return widths, heights
 }
 
-func (layer hLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
+func (layer *hLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
 	elements := layer.elements
 	x, y := 0, 0
 
@@ -125,7 +125,7 @@ func (layer hLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
 	}
 }
 
-func (layer hLayer) Render(canvas Canvas) { renderListLayer(layer, canvas) }
+func (layer *hLayer) Render(canvas Canvas) { renderListLayer(layer, canvas) }
 
 type vLayer struct{ elements []Layer }
 
@@ -168,21 +168,21 @@ func (layer *zLayer) Elements() []Layer {
 	return layer.elements
 }
 
-func (layer zLayer) Width() size.T {
+func (layer *zLayer) Width() size.T {
 	return size.Max(mapWidths(layer.elements))
 }
 
-func (layer zLayer) Height() size.T {
+func (layer *zLayer) Height() size.T {
 	return size.Max(mapHeights(layer.elements))
 }
 
-func (layer zLayer) AllocSizes(w, h int) ([]int, []int) {
+func (layer *zLayer) AllocSizes(w, h int) ([]int, []int) {
 	widths := size.AllocMax(w, mapWidths(layer.elements))
 	heights := size.AllocMax(h, mapHeights(layer.elements))
 	return widths, heights
 }
 
-func (layer zLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
+func (layer *zLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
 	x, y := 0, 0
 	for i, elem := range layer.elements {
 		w := widths[i]
