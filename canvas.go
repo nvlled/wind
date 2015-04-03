@@ -72,25 +72,28 @@ type TermCanvas struct {
 }
 
 func (canvas *TermCanvas) New(x, y, width, height int) Canvas {
+	w, h := canvas.Dimension()
 	return &TermCanvas{
 		baseX:  canvas.baseX + x,
 		baseY:  canvas.baseY + y,
-		width:  clamp(width, 0, canvas.width),
-		height: clamp(height, 0, canvas.height),
+		width:  clamp(width, 0, w),
+		height: clamp(height, 0, h),
 	}
 }
 
 func (canvas *TermCanvas) Draw(x, y int, ch rune, fg, bg uint16) {
-	if x >= 0 && x <= canvas.width &&
-		y >= 0 && y <= canvas.height {
+	w, h := canvas.Dimension()
+	if x >= 0 && x <= w &&
+		y >= 0 && y <= h {
 		term.SetCell(canvas.baseX+x, canvas.baseY+y,
 			ch, term.Attribute(fg), term.Attribute(bg))
 	}
 }
 
 func (canvas *TermCanvas) Clear() {
-	for x := 0; x < canvas.width; x++ {
-		for y := 0; y < canvas.height; y++ {
+	w, h := canvas.Dimension()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
 			canvas.Draw(x, y, ' ', 0, 0)
 		}
 	}
@@ -110,6 +113,30 @@ func (canvas *TermCanvas) Dimension() (int, int) {
 
 func (canvas *TermCanvas) Base() (int, int) {
 	return canvas.baseX, canvas.baseY
+}
+
+type FullTermCanvas struct {
+	TermCanvas
+}
+
+func (canvas *FullTermCanvas) Width() int {
+	// embedding doesn't work like inheritance
+	width, _ := term.Size()
+	canvas.width = width
+	return width
+}
+
+func (canvas *FullTermCanvas) Height() int {
+	_, height := term.Size()
+	canvas.height = height
+	return height
+}
+
+func (canvas *FullTermCanvas) Dimension() (int, int) {
+	w, h := term.Size()
+	canvas.width = w
+	canvas.height = h
+	return w, h
 }
 
 type ColorCanvas struct {

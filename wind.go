@@ -46,6 +46,28 @@ type cacheLayer struct {
 	allocCached  bool
 }
 
+func (layer *cacheLayer) clear() {
+	layer.sizeCached = false
+	layer.allocCached = false
+	for _, subLayer := range layer.subLayer.Elements() {
+		if l, ok := subLayer.(*cacheLayer); ok {
+			l.clear()
+		}
+	}
+}
+
+func (layer *cacheLayer) Elements() []Layer {
+	return layer.subLayer.Elements()
+}
+
+func (layer *cacheLayer) AllocSizes(w, h int) ([]int, []int) {
+	return layer.subLayer.AllocSizes(w, h)
+}
+
+func (layer *cacheLayer) RenderAlloc(canvas Canvas, widths, heights []int) {
+	layer.subLayer.RenderAlloc(canvas, widths, heights)
+}
+
 func (layer *cacheLayer) cacheSize() {
 	subLayer := layer.subLayer
 	if !layer.sizeCached {
@@ -68,7 +90,6 @@ func (layer *cacheLayer) cacheAlloc(w, h int) ([]int, []int) {
 
 func (layer *cacheLayer) Width() size.T {
 	layer.cacheSize()
-	layer.sizeCached = true
 	return layer.width
 }
 

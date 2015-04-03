@@ -1,7 +1,6 @@
 package wind
 
 import (
-	term "github.com/nsf/termbox-go"
 	"github.com/nvlled/wind/size"
 	"strings"
 )
@@ -37,13 +36,7 @@ func NewStringCanvas(width, height int) *StringCanvas {
 
 // Invoke termbox.Init() before creating TermCanvas
 func NewTermCanvas() Canvas {
-	w, h := term.Size()
-	return &TermCanvas{
-		baseX:  0,
-		baseY:  0,
-		width:  w,
-		height: h,
-	}
+	return &FullTermCanvas{}
 }
 
 func ChangeDefaultColor(fg, bg uint16, canvas Canvas) Canvas {
@@ -203,4 +196,10 @@ func Either(left Defer, right Layer) Layer {
 		}
 		layer.Render(canvas)
 	})
+}
+
+func ClearCache(layer Layer) {
+	if cache, ok := layer.(*cacheLayer); ok {
+		cache.clear()
+	}
 }
