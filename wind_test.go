@@ -22,7 +22,7 @@ var stars = CharBlock('*')
 //|a | b  | c |  d |  e | f |                 |
 //|  |    |   |    |    |   |                 |
 //|  |    |   |    |    |   |                 |
-//|-----------+-------------+-----------------|
+//|--+----+---+----+----+---+-----------------|
 //|    j              i                       |
 //|                                           |
 //---------------------------------------------
@@ -87,14 +87,16 @@ func TestStringCanvas(t *testing.T) {
 
 func TestStringCanvas2(t *testing.T) {
 	canvas := NewStringCanvas(100, 15)
-	layer := Border('+', 'x',
+	layer := Border(
+		'+', 'x',
 		Zlayer(
+			SetColor(0, 0, Text("colored text")),
 			AlignDownRight(Hlayer(
 				Size(5, 5, stars),
 				Size(8, 6, doughs),
 				Size(30, 10, spikes),
 			)),
-			AlignDown(Border('-', '|', Text("bordered text"))),
+			AlignDown(Border('─', '│', Text("bordered text"))),
 			Vlayer(
 				Border('*', '*', Text("line one\nline two\nline three")),
 				TextLine("line four\nline five"),
@@ -102,6 +104,74 @@ func TestStringCanvas2(t *testing.T) {
 		))
 	layer.Render(canvas)
 	println(canvas.String())
+}
+
+func TestCaching(t *testing.T) {
+	println("────────────────────")
+	canvas := NewStringCanvas(100, 15)
+	layer := Vlayer(
+		Size(5, 5, stars),
+		Size(9, 3, spikes),
+		Size(5, 9, doughs),
+	)
+	layer.Render(canvas)
+	layer.Render(canvas)
+	layer.Render(canvas)
+	layer.Render(canvas)
+	println(canvas.String())
+}
+
+func BenchmarkUncached(b *testing.B) {
+	hlayer := func(elms ...Layer) Layer { return &hLayer{elms} }
+	vlayer := func(elms ...Layer) Layer { return &vLayer{elms} }
+	zlayer := func(elms ...Layer) Layer { return &zLayer{elms} }
+	layer := Vlayer(
+		zlayer(Vlayer(stars, doughs, spikes, doughs, spikes)),
+		zlayer(stars, doughs, spikes, doughs, spikes),
+		hlayer(stars, doughs, spikes, doughs, spikes),
+		hlayer(stars, doughs, spikes, doughs, spikes),
+		vlayer(stars, doughs, spikes, doughs, spikes),
+		zlayer(stars, doughs, spikes, doughs, spikes),
+		vlayer(
+			zlayer(
+				hlayer(stars, doughs, spikes, doughs, spikes),
+				vlayer(stars, doughs, spikes, doughs, spikes),
+			),
+			hlayer(
+				zlayer(Vlayer(stars, doughs, spikes, doughs, spikes)),
+				zlayer(stars, doughs, spikes, doughs, spikes),
+			),
+		),
+	)
+	canvas := NewStringCanvas(500, 40)
+	for i := 0; i < b.N; i++ {
+		layer.Render(canvas)
+	}
+}
+
+func BenchmarkCached(b *testing.B) {
+	layer := Vlayer(
+		Zlayer(Vlayer(stars, doughs, spikes, doughs, spikes)),
+		Zlayer(stars, doughs, spikes, doughs, spikes),
+		Hlayer(stars, doughs, spikes, doughs, spikes),
+		Hlayer(stars, doughs, spikes, doughs, spikes),
+		Vlayer(stars, doughs, spikes, doughs, spikes),
+		Zlayer(stars, doughs, spikes, doughs, spikes),
+		Vlayer(
+			Zlayer(
+				Hlayer(stars, doughs, spikes, doughs, spikes),
+				Vlayer(stars, doughs, spikes, doughs, spikes),
+			),
+			Hlayer(
+				Zlayer(Vlayer(stars, doughs, spikes, doughs, spikes)),
+				Zlayer(stars, doughs, spikes, doughs, spikes),
+			),
+		),
+	)
+	canvas := NewStringCanvas(500, 40)
+	for i := 0; i < b.N; i++ {
+		layer.Render(canvas)
+	}
 }
 
 func printInts(xs []int) {
