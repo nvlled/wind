@@ -125,6 +125,10 @@ func Zlayer(elements ...Layer) Layer {
 	return Cache(&zLayer{elements})
 }
 
+func NoExpand(layer Layer) Layer {
+	return &aligner{layer, false, false}
+}
+
 func AlignRight(layer Layer) Layer {
 	return &aligner{layer, true, false}
 }
@@ -183,6 +187,8 @@ func SetColor(fg, bg uint16, layer Layer) Layer {
 	})
 }
 
+// ref must not be a subLayer
+// or else tortoise all the way down
 func SyncSize(ref Layer, layer Layer) Layer {
 	return &syncer{ref, layer, true, true}
 }

@@ -20,9 +20,19 @@ func createLayer() wind.Layer {
 				wind.SetColor(uint16(term.ColorBlue), 0, wind.Text("cool text")),
 			),
 			wind.Vlayer(
-				wind.Border(' ', ' ', wind.Size(-1, 5, wind.Text("some text\nwith words\nthat says something"))),
-				// Note: haven't fixed this one
-				wind.Size(1, 5, wind.AlignDownRight(wind.Size(1, 5, wind.CharBlock('v')))),
+				wind.Border('.', '.', wind.Size(-1, 5, wind.Text("some text\nwith words\nthat says something"))),
+				// another case with a surprising result, constrast (1) with (2)
+				// (1)
+				wind.Border(
+					'+', '+',
+					wind.Size(10, 5, wind.NoExpand(wind.Size(5, 3, wind.CharBlock('>')))),
+				),
+				wind.Line('─'),
+				// (2)
+				wind.Border(
+					'+', '+',
+					wind.Size(10, 5, wind.Size(5, 3, wind.CharBlock('>'))),
+				),
 			),
 		),
 		wind.Border('x', '+', wind.Border(' ', ' ', wind.SizeW(-1, wind.Text("Saying something pointless to see if something doesn't work\nAlso saying more things to see if doesn't work again\nLastly saying something to just because")))),
