@@ -26,7 +26,6 @@ func createLayer() wind.Layer {
 			wind.Vlayer(
 				wind.Zlayer(
 					bbb,
-					// TODO: the text doesn't resize quite right
 					wind.SetColor(0, uint16(term.ColorCyan),
 						wind.Text("Try resizing the terminal window\nand see if it does work")),
 				),

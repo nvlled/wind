@@ -58,12 +58,22 @@ type RenderLayer func(canvas Canvas)
 type Defer func() Layer
 
 func Text(s string) Layer {
-	var layers []Layer
-	for _, line := range strings.Split(s, "\n") {
-		w := len(line)
-		layers = append(layers, SizeW(w, TextLine(line)))
+	lines := strings.Split(s, "\n")
+	h := len(lines)
+	w := 0
+	for _, line := range lines {
+		length := len(line)
+		if length > w {
+			w = length
+		}
 	}
-	return Vlayer(layers...)
+	return Size(w, h, RenderLayer(func(canvas Canvas) {
+		for y, line := range lines {
+			for x, ch := range []rune(line) {
+				canvas.Draw(x, y, ch, 0, 0)
+			}
+		}
+	}))
 }
 
 func CharBlock(ch rune) Layer {
