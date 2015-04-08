@@ -1,6 +1,7 @@
 package wind
 
 import (
+	"fmt"
 	"github.com/nvlled/wind/size"
 )
 
@@ -333,7 +334,6 @@ func (bLayer *borderLayer) Render(canvas Canvas) {
 
 // ref must not be a subLayer
 // or else tortoise all the way down
-
 type syncer struct {
 	ref        Layer
 	layer      Layer
@@ -357,4 +357,77 @@ func (s *syncer) Height() size.T {
 
 func (s *syncer) Render(canvas Canvas) {
 	s.layer.Render(canvas)
+}
+
+type tabLayer struct {
+	elements      []Layer
+	namedElements map[string]Layer
+	showName      string
+	showIndex     int
+}
+
+func (tab *tabLayer) Width() size.T {
+	return size.Max(mapWidths(tab.Elements()))
+}
+
+func (tab *tabLayer) Height() size.T {
+	return size.Max(mapHeights(tab.Elements()))
+}
+
+func (tab *tabLayer) Render(canvas Canvas) {
+	name := tab.showName
+	index := tab.showIndex
+	if name != "" {
+		if elem, ok := tab.namedElements[name]; ok {
+			elem.Render(canvas)
+		} else {
+			canvas.Clear()
+			canvas.DrawText(0, 0, "element not found: "+name, 0, 0)
+		}
+	} else if index >= 0 {
+		if index < len(tab.elements) {
+			elem := tab.elements[index]
+			elem.Render(canvas)
+		} else {
+			canvas.Clear()
+			canvas.DrawText(0, 0, fmt.Sprintf("invalid index: %d", index), 0, 0)
+		}
+	} else {
+		canvas.Clear()
+	}
+}
+
+func (tab *tabLayer) Elements() []Layer {
+	var elements []Layer
+	for _, elem := range tab.elements {
+		elements = append(elements, elem)
+	}
+	return elements
+}
+
+func (tab *tabLayer) SetElements(elements ...Layer) TabLayer {
+	tab.elements = elements
+	return tab
+}
+
+func (tab *tabLayer) Name(name string, layer Layer) Layer {
+	tab.namedElements[name] = layer
+	return layer
+}
+
+func (tab *tabLayer) ShowName(name string) TabLayer {
+	tab.showName = name
+	return tab
+}
+
+func (tab *tabLayer) ShowIndex(index int) TabLayer {
+	tab.showName = ""
+	tab.showIndex = index
+	return tab
+}
+
+func (tab *tabLayer) Hide() TabLayer {
+	tab.showName = ""
+	tab.showIndex = -1
+	return tab
 }

@@ -53,6 +53,15 @@ type Layer interface {
 	Render(canvas Canvas)
 }
 
+type TabLayer interface {
+	Layer
+	Name(name string, elem Layer) Layer
+	SetElements(elements ...Layer) TabLayer
+	ShowName(name string) TabLayer
+	ShowIndex(index int) TabLayer
+	Hide() TabLayer
+}
+
 type RenderLayer func(canvas Canvas)
 
 type Defer func() Layer
@@ -212,6 +221,12 @@ func Either(left Defer, right Layer) Layer {
 		}
 		layer.Render(canvas)
 	})
+}
+
+func Tab() TabLayer {
+	return &tabLayer{
+		namedElements: make(map[string]Layer),
+	}
 }
 
 func ClearCache(layer Layer) {
