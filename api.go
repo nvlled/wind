@@ -36,7 +36,9 @@ func NewStringCanvas(width, height int) *StringCanvas {
 
 // Invoke termbox.Init() before creating TermCanvas
 func NewTermCanvas() Canvas {
-	return &FullTermCanvas{}
+	canvas := &FullTermCanvas{}
+	canvas.Dimension()
+	return canvas
 }
 
 func ChangeDefaultColor(fg, bg uint16, canvas Canvas) Canvas {
