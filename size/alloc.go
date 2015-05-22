@@ -42,7 +42,6 @@ func AllocFair(value int, sizes []T) []int {
 	}
 
 	indices := []int{}
-	x := 0
 
 	// TODO: reduce number of iterations
 
@@ -53,7 +52,6 @@ func AllocFair(value int, sizes []T) []int {
 			deduct(i, int(t))
 		case RangeT:
 			deduct(i, t.min)
-			x += t.max - t.min
 			indices = append(indices, i)
 		case FreeT:
 			indices = append(indices, i)
