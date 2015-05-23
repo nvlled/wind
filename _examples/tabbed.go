@@ -17,7 +17,7 @@ func main() {
 	canvas := wind.NewTermCanvas()
 	tab := wind.Tab()
 	layer := wind.Vlayer(
-		wind.Text("Tabbed"),
+		wind.Text("Tabbed | Press keys 1, 2 or 3 to switch tab"),
 		wind.Line('─'),
 		tab.SetElements(
 			tab.Name("ones", tabElem1),
@@ -43,9 +43,8 @@ func main() {
 			}
 		} else {
 			switch e.Key {
-			case term.KeyArrowLeft:
-				tab.ShowName("blocks")
-			case term.KeyArrowRight:
+			case term.KeyCtrlC:
+				goto exit
 			}
 		}
 	}

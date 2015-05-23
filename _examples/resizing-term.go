@@ -49,7 +49,7 @@ func main() {
 		term.Flush()
 
 		e := term.PollEvent()
-		if e.Ch == 'q' {
+		if e.Ch == 'q' || e.Key == term.KeyCtrlC {
 			break
 		} else if e.Type == term.EventResize {
 			term.Clear(0, 0)
