@@ -284,6 +284,63 @@ func (c *constrainer) Render(canvas Canvas) {
 	c.layer.Render(canvas)
 }
 
+func (_ *constrainer) SetSize(w, h int) SizedLayer {
+	return &constrainer{
+		width:  size.Int(w),
+		height: size.Int(h),
+	}
+}
+
+func (c *constrainer) AdaptWidth() SizedLayer {
+	return &constrainer{
+		width:  size.Adapt,
+		height: c.height,
+		layer:  c.layer,
+	}
+}
+
+func (c *constrainer) AdaptHeight() SizedLayer {
+	return &constrainer{
+		width:  c.width,
+		height: size.Adapt,
+		layer:  c.layer,
+	}
+}
+
+func (c *constrainer) FreeWidth() SizedLayer {
+	return &constrainer{
+		width:  size.Free,
+		height: c.height,
+		layer:  c.layer,
+	}
+}
+
+func (c *constrainer) FreeHeight() SizedLayer {
+	return &constrainer{
+		width:  c.width,
+		height: size.Free,
+		layer:  c.layer,
+	}
+}
+
+func (c *constrainer) InheritWidth() SizedLayer {
+	var w size.T = nil
+	return &constrainer{
+		width:  w,
+		height: c.height,
+		layer:  c.layer,
+	}
+}
+
+func (c *constrainer) InheritHeight() SizedLayer {
+	var h size.T = nil
+	return &constrainer{
+		width:  c.width,
+		height: h,
+		layer:  c.layer,
+	}
+}
+
 type Wrapper struct {
 	layer    Layer
 	renderer func(canvas Canvas)

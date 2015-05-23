@@ -64,6 +64,20 @@ type TabLayer interface {
 	Hide() TabLayer
 }
 
+type SizedLayer interface {
+	Layer
+	SetSize(w, h int) SizedLayer
+
+	AdaptWidth() SizedLayer
+	AdaptHeight() SizedLayer
+
+	FreeWidth() SizedLayer
+	FreeHeight() SizedLayer
+
+	InheritHeight() SizedLayer
+	InheritWidth() SizedLayer
+}
+
 type RenderLayer func(canvas Canvas)
 
 type Defer func() Layer
@@ -156,19 +170,19 @@ func Free(layer Layer) Layer {
 	return &constrainer{size.Free, size.Free, layer}
 }
 
-func Size(width, height int, layer Layer) Layer {
+func Size(width, height int, layer Layer) SizedLayer {
 	w := size.Int(width)
 	h := size.Int(height)
 	return &constrainer{w, h, layer}
 }
 
-func SizeW(width int, layer Layer) Layer {
+func SizeW(width int, layer Layer) SizedLayer {
 	w := size.Int(width)
 	var h size.T = nil
 	return &constrainer{w, h, layer}
 }
 
-func SizeH(height int, layer Layer) Layer {
+func SizeH(height int, layer Layer) SizedLayer {
 	var w size.T = nil
 	h := size.Int(height)
 	return &constrainer{w, h, layer}
