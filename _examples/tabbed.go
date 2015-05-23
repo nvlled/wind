@@ -18,7 +18,7 @@ func main() {
 	tab := wind.Tab()
 	layer := wind.Vlayer(
 		wind.Text("Tabbed | Press keys 1, 2 or 3 to switch tab"),
-		wind.Line('─'),
+		wind.LineH('─'),
 		tab.SetElements(
 			tab.Name("ones", tabElem1),
 			tab.Name("twos", tabElem2),

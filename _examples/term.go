@@ -8,13 +8,13 @@ import (
 func createLayer() wind.Layer {
 	return wind.Vlayer(
 		wind.Border('-', '|', wind.TextLine("This is a text")),
-		wind.Line('^'),
+		wind.LineH('^'),
 		wind.Hlayer(
 			wind.Vlayer(
 				wind.SetColor(uint16(term.ColorRed), 0, wind.Text("burn this mudder flaundering text")),
-				wind.Line('^'),
-				wind.Line('*'),
-				wind.Line('&'),
+				wind.LineH('^'),
+				wind.LineH('*'),
+				wind.LineH('&'),
 				wind.TextLine("you swelling fork"),
 				wind.TextLine("keel yourself"),
 				wind.SetColor(uint16(term.ColorBlue), 0, wind.Text("cool text")),
@@ -27,7 +27,7 @@ func createLayer() wind.Layer {
 					'+', '+',
 					wind.Size(10, 5, wind.NoExpand(wind.Size(5, 3, wind.CharBlock('>')))),
 				),
-				wind.Line('─'),
+				wind.LineH('─'),
 				// (2)
 				wind.Border(
 					'+', '+',

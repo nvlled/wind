@@ -192,8 +192,12 @@ func Border(cx, cy rune, layer Layer) Layer {
 	return &borderLayer{layer, cx, cy}
 }
 
-func Line(ch rune) Layer {
-	return SizeH(1, CharBlock(ch))
+func LineH(ch rune) Layer {
+	return SizeH(1, CharBlock(ch)).AdaptWidth()
+}
+
+func LineV(ch rune) Layer {
+	return SizeW(1, CharBlock(ch)).AdaptHeight()
 }
 
 func TapRender(layer Layer, render func(layer Layer, canvas Canvas)) Layer {
