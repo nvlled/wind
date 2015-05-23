@@ -16,6 +16,7 @@ type T interface {
 type ConstT int
 type RangeT struct{ min, max int }
 type FreeT struct{}
+type AdaptT struct{}
 
 type Folder func(sizes []T) T
 type Allocator func(x int, sizes []T) []int
@@ -24,16 +25,19 @@ func Const(x int) ConstT    { return ConstT(x) }
 func Range(x, y int) RangeT { return RangeT{x, y} }
 
 var Free = FreeT{}
+var Adapt = AdaptT{}
 
 func (_ ConstT) Size() {}
 func (_ RangeT) Size() {}
 func (_ FreeT) Size()  {}
+func (_ AdaptT) Size() {}
 
 func (s ConstT) String() string { return fmt.Sprintf("ConstT(%d)", int(s)) }
 func (s RangeT) String() string {
 	return fmt.Sprintf("RangeT(%d, %d)", s.min, s.max)
 }
-func (s FreeT) String() string { return "FreeT" }
+func (s FreeT) String() string  { return "FreeT" }
+func (s AdaptT) String() string { return "AdaptT" }
 
 func (c ConstT) Equals(s T) bool {
 	switch t := s.(type) {
@@ -54,6 +58,14 @@ func (r RangeT) Equals(s T) bool {
 func (r FreeT) Equals(s T) bool {
 	switch s.(type) {
 	case FreeT:
+		return true
+	}
+	return false
+}
+
+func (r AdaptT) Equals(s T) bool {
+	switch s.(type) {
+	case AdaptT:
 		return true
 	}
 	return false
@@ -85,9 +97,14 @@ func (f FreeT) LessThan(s T) bool {
 	return false
 }
 
+func (f AdaptT) LessThan(s T) bool {
+	return true
+}
+
 func (s ConstT) Value(alloc int) int { return lower(alloc, int(s)) }
 func (s RangeT) Value(alloc int) int { return lower(alloc, s.Length()) }
 func (s FreeT) Value(alloc int) int  { return alloc }
+func (s AdaptT) Value(alloc int) int { return alloc }
 
 func (e FreeT) Add(s T) T {
 	return e
@@ -102,6 +119,8 @@ func (c ConstT) Add(s T) T {
 		return Const(x + int(v))
 	case RangeT:
 		return reduct(Range(x+v.min, x+v.max))
+	case AdaptT:
+		return c
 	}
 	panic("non-exhaustive case analysis")
 }
@@ -114,8 +133,14 @@ func (r RangeT) Add(s T) T {
 		return v.Add(r)
 	case RangeT:
 		return reduct(Range(r.min+v.min, r.max+v.max))
+	case AdaptT:
+		return r
 	}
 	return s.Add(r)
+}
+
+func (_ AdaptT) Add(s T) T {
+	return s
 }
 
 func Sum(sizes []T) T {

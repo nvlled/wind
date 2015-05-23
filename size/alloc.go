@@ -53,7 +53,7 @@ func AllocFair(value int, sizes []T) []int {
 		case RangeT:
 			deduct(i, t.min)
 			indices = append(indices, i)
-		case FreeT:
+		default:
 			indices = append(indices, i)
 		}
 	}
@@ -64,7 +64,7 @@ func AllocFair(value int, sizes []T) []int {
 
 	for _, i := range indices {
 		switch t := sizes[i].(type) {
-		case FreeT:
+		default:
 			subvals[i] += n
 		case RangeT:
 			m := subvals[i] + n
@@ -80,7 +80,7 @@ func AllocFair(value int, sizes []T) []int {
 
 	for i := len(indices) - 1; i >= 0 && value > 0; i-- {
 		switch t := sizes[i].(type) {
-		case FreeT:
+		default:
 			subvals[i] += value
 			value = 0
 		case RangeT:
