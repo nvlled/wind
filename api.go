@@ -26,11 +26,13 @@ func NewStringCanvas(width, height int) *StringCanvas {
 		}
 	}
 	return &StringCanvas{
+		rect: rect{
+			x:      0,
+			y:      0,
+			width:  width,
+			height: height,
+		},
 		buffer: buffer,
-		baseX:  0,
-		baseY:  0,
-		width:  width,
-		height: height,
 	}
 }
 
