@@ -25,6 +25,22 @@ func (r rect) subRect(x, y, w, h int) rect {
 	}
 }
 
+type nilCanvas struct{ rect }
+
+func (canvas *nilCanvas) New(x, y, w, h int) Canvas {
+	return &nilCanvas{canvas.rect.subRect(x, y, w, h)}
+}
+
+func (_ *nilCanvas) Draw(_, _ int, _ rune, _, _ uint16)       {}
+func (_ *nilCanvas) DrawText(_, _ int, _ string, _, _ uint16) {}
+
+func (_ *nilCanvas) Clear() {}
+
+type StringCanvas struct {
+	rect
+	buffer [][]rune
+}
+
 func (canvas *StringCanvas) New(x, y, width, height int) Canvas {
 	return &StringCanvas{
 		buffer: canvas.buffer,

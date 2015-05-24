@@ -9,6 +9,11 @@ import (
 //		 because it sounds more cool-er
 //		 and consistent with Zlayer
 
+// TODO: Rename Width and Height to PreferredWith and PreferredHeight
+// TODO: Canvas canvas color type to term.Attribute
+
+// FIX: border must be inside a HLayer to get the right size
+
 func (f RenderLayer) Render(canvas Canvas) { f(canvas) }
 func (f RenderLayer) Width() size.T        { return size.Free }
 func (f RenderLayer) Height() size.T       { return size.Free }

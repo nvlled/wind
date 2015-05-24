@@ -168,6 +168,7 @@ func AlignDownRight(layer Layer) Layer {
 	return &aligner{layer, true, true}
 }
 
+// TODO: rename to FreeSize
 func Free(layer Layer) Layer {
 	return &constrainer{size.Free, size.Free, layer}
 }
@@ -255,4 +256,10 @@ func ClearCache(layer Layer) {
 	if cache, ok := layer.(*cacheLayer); ok {
 		cache.clear()
 	}
+}
+
+func PreRender(layer Layer, w, h int) {
+	layer.Render(&nilCanvas{
+		rect: rect{width: w, height: h},
+	})
 }

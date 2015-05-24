@@ -102,6 +102,7 @@ func TestStringCanvas2(t *testing.T) {
 				TextLine("line four\nline five"),
 			),
 		))
+	PreRender(layer, 100, 15)
 	layer.Render(canvas)
 	println(canvas.String())
 }
